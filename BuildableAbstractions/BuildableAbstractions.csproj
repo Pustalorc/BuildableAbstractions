@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net481</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Pustalorc.BuildableAbstractions</AssemblyName>
+        <RootNamespace>Pustalorc.Libraries.BuildableAbstractions</RootNamespace>
+        <LangVersion>11</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>Pustalorc.BuildableAbstractions</PackageId>
+        <Authors>Pustalorc</Authors>
+        <Company>Pustalorc</Company>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="Rocket.API">
+        <HintPath>libs\Rocket.API.dll</HintPath>
+      </Reference>
+      <Reference Include="Rocket.Core">
+        <HintPath>libs\Rocket.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Rocket.Unturned">
+        <HintPath>libs\Rocket.Unturned.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Lib.Harmony" Version="2.2.2" />
+      <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2020.3.38" />
+      <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.3.1" />
+      <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.0" />
+    </ItemGroup>
+
+</Project>
