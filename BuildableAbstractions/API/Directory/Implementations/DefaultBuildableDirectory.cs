@@ -14,35 +14,39 @@ using Logger = Rocket.Core.Logging.Logger;
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 
 /// <summary>
-/// A default buildable directory that handles all of nelson's events, holds a basic list of all buildables in the map, indexes them, and raises events where necessary.
+///     A default buildable directory that handles all of nelson's events, holds a basic list of all buildables in the map,
+///     indexes them, and raises events where necessary.
 /// </summary>
 [PublicAPI]
 public class DefaultBuildableDirectory : IBuildableDirectory
 {
     /// <summary>
-    /// All the buildables in the game currently.
+    ///     All the buildables in the game currently.
     /// </summary>
     protected List<Buildable> Buildables { get; }
+
     /// <summary>
-    /// All the barricade buildables, but indexed by Nelson's InstanceId.
+    ///     All the barricade buildables, but indexed by Nelson's InstanceId.
     /// </summary>
     protected Dictionary<uint, BarricadeBuildable> InstanceIdIndexedBarricades { get; }
+
     /// <summary>
-    /// All the structure buildables, but indexed by Nelson's InstanceId.
+    ///     All the structure buildables, but indexed by Nelson's InstanceId.
     /// </summary>
     protected Dictionary<uint, StructureBuildable> InstanceIdIndexedStructures { get; }
+
     /// <summary>
-    /// All the buildables, but indexed by Unity's <see cref="Transform"/>.
+    ///     All the buildables, but indexed by Unity's <see cref="Transform" />.
     /// </summary>
     protected Dictionary<Transform, Buildable> TransformIndexedBuildables { get; }
 
     /// <summary>
-    /// The constructor for the directory.
+    ///     The constructor for the directory.
     /// </summary>
     /// <remarks>
-    /// This constructor hooks onto Level.onPostLevelLoaded.
-    /// If you inherit this class, and you instantiate it when the server is fully loaded,
-    /// you will have to manually call LevelLoaded(0) yourself, as the event will not fire again.
+    ///     This constructor hooks onto Level.onPostLevelLoaded.
+    ///     If you inherit this class, and you instantiate it when the server is fully loaded,
+    ///     you will have to manually call LevelLoaded(0) yourself, as the event will not fire again.
     /// </remarks>
     public DefaultBuildableDirectory()
     {
@@ -69,7 +73,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
     }
 
     /// <summary>
-    /// Gets all the buildables of the specified type and filters them with some options.
+    ///     Gets all the buildables of the specified type and filters them with some options.
     /// </summary>
     /// <param name="options">The options to filter the results with.</param>
     /// <typeparam name="T">The type of buildable you wish to retrieve.</typeparam>
@@ -163,7 +167,8 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!TransformIndexedBuildables.TryGetValue(buildable.Model, out var storedBuild))
             TransformIndexedBuildables.Add(buildable.Model, buildable);
         else
-            Logger.LogWarning($"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
+            Logger.LogWarning(
+                $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
         BuildableDirectory.RaiseBuildableSpawned(buildable);
     }
@@ -178,7 +183,8 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!TransformIndexedBuildables.TryGetValue(buildable.Model, out var storedBuild))
             TransformIndexedBuildables.Add(buildable.Model, buildable);
         else
-            Logger.LogWarning($"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
+            Logger.LogWarning(
+                $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
         BuildableDirectory.RaiseBuildableSpawned(buildable);
     }

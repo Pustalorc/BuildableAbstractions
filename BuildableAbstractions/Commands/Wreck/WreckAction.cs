@@ -4,7 +4,7 @@ using Rocket.API;
 using SDG.Unturned;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Actions;
+namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
 
 /// <summary>
 ///     A wreck action for a collection of <see cref="Buildable" />s.
@@ -20,15 +20,13 @@ internal readonly struct WreckAction
 
     /// <summary>
     ///     The center position of the wreck action.
-    ///     <br />
-    ///     If no position is wanted, this value is to be set to <see cref="Vector3.negativeInfinity" />.
     /// </summary>
-    public Vector3 Center { get; }
+    public Vector3? Center { get; }
 
     /// <summary>
     ///     A list of all <see cref="ItemAsset" />s that will be targeted.
     /// </summary>
-    public List<ItemAsset> ItemAssets { get; }
+    public HashSet<ushort> ItemAssets { get; }
 
     /// <summary>
     ///     The name of the user input for item asset search, or the name of the only item asset used.
@@ -36,9 +34,9 @@ internal readonly struct WreckAction
     public string ItemAssetName { get; }
 
     /// <summary>
-    ///     The radius based on the Center specified in this object.
+    ///     The max radius based on the Center specified in this object.
     /// </summary>
-    public float Radius { get; }
+    public float MaxRadius { get; }
 
     /// <summary>
     ///     If the action should care about things on vehicles.
@@ -68,10 +66,10 @@ internal readonly struct WreckAction
     ///     If no position is wanted, this value is to be set to <see cref="Vector3.negativeInfinity" />.
     /// </param>
     /// <param name="assets">A list of all <see cref="ItemAsset" />s that will be targeted.</param>
-    /// <param name="radius">The radius based on the Center specified in this object.</param>
+    /// <param name="maxRadius">The max radius based on the Center specified in this object.</param>
     /// <param name="itemAssetName">The name of the user input for item asset search, or the name of the only item asset used.</param>
-    public WreckAction(bool plants, bool barricades, bool structs, IRocketPlayer? target, Vector3 center,
-        List<ItemAsset> assets, float radius, string itemAssetName)
+    public WreckAction(bool plants, bool barricades, bool structs, IRocketPlayer? target, Vector3? center,
+        HashSet<ushort> assets, float maxRadius, string itemAssetName)
     {
         IncludeVehicles = plants;
         FilterForBarricades = barricades;
@@ -79,7 +77,7 @@ internal readonly struct WreckAction
         TargetPlayer = target;
         Center = center;
         ItemAssets = assets;
-        Radius = radius;
+        MaxRadius = maxRadius;
         ItemAssetName = itemAssetName;
     }
 }

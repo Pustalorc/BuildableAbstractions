@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
@@ -14,14 +12,12 @@ using Rocket.API;
 using Rocket.Unturned.Player;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands;
+namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
 
-public sealed class FindBuildsCommand : RocketCommandWithTranslations
+internal sealed class FindBuildsCommand : RocketCommandWithTranslations
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Both;
-
     public override string Name => "findBuilds";
-
     public override string Help => "Finds buildables around the map";
 
     public override string Syntax =>
@@ -31,17 +27,23 @@ public sealed class FindBuildsCommand : RocketCommandWithTranslations
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
-        { "command_exception", "The command failed to execute. Error: " }
+        { TranslationKeys.CommandExceptionKey, CommandTranslationConstants.CommandExceptionValue },
+        { CommandTranslationConstants.NotAvailableKey, CommandTranslationConstants.NotAvailableValue },
+        {
+            CommandTranslationConstants.CannotExecuteFromConsoleKey,
+            CommandTranslationConstants.CannotExecuteFromConsoleValue
+        },
+        { CommandTranslationConstants.BuildCountKey, CommandTranslationConstants.BuildCountValue }
     };
 
-    public FindBuildsCommand(StringComparer stringComparer) : base(true, stringComparer)
+    public FindBuildsCommand(Dictionary<string, string> translations) : base(true, translations)
     {
     }
 
     public override Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {
         var args = command.ToList();
-        var notAvailableText = Translate("not_available");
+        var notAvailableText = Translate(CommandTranslationConstants.NotAvailableKey);
 
         var itemAssetInput = notAvailableText;
         var itemAssetName = notAvailableText;
@@ -64,7 +66,7 @@ public sealed class FindBuildsCommand : RocketCommandWithTranslations
         if (index > -1)
             args.RemoveAt(index);
 
-        var itemAssets = args.GetMultipleItemAssets(out index).ToDictionary(k => k.id);
+        var itemAssets = args.GetMultipleItemAssets(out index);
         var assetCount = itemAssets.Count;
         if (index > -1)
         {
@@ -72,19 +74,43 @@ public sealed class FindBuildsCommand : RocketCommandWithTranslations
             args.RemoveAt(index);
         }
 
+        itemAssetName = assetCount switch
+        {
+            1 => itemAssets.First().itemName,
+            > 1 => itemAssetInput,
+            _ => itemAssetName
+        };
+
         var radius = args.GetFloat(out index);
         if (index > -1)
             args.RemoveAt(index);
 
-        var owner = 0UL;
+        ulong owner = default;
 
-        if (target != null && ulong.TryParse(target.Id, out var id))
+        if (target != null && ulong.TryParse(target.Id, out var pId))
         {
             targetStr = target.DisplayName;
-            owner = id;
+            owner = pId;
         }
 
-        var options = new GetBuildableOptions(owner, default, plants);
+        var maxRange = float.MaxValue;
+        Vector3? position = default;
+
+        if (!float.IsNegativeInfinity(radius))
+        {
+            radiusStr = radius.ToString(CultureInfo.InvariantCulture);
+            if (caller is not UnturnedPlayer cPlayer)
+            {
+                SendTranslatedMessage(caller, CommandTranslationConstants.CannotExecuteFromConsoleKey);
+                return Task.CompletedTask;
+            }
+
+            maxRange = Mathf.Pow(radius, 2);
+            position = cPlayer.Position;
+        }
+
+        var options = new GetBuildableOptions(owner, default, plants, maxRange, float.MinValue, position,
+            itemAssets.Select(itemAsset => itemAsset.id).ToHashSet());
         IEnumerable<Buildable> builds;
 
         if (barricades)
@@ -94,29 +120,8 @@ public sealed class FindBuildsCommand : RocketCommandWithTranslations
         else
             builds = BuildableDirectory.Instance.GetBuildables<Buildable>(options);
 
-        if (assetCount > 0)
-            builds = builds.Where(k => itemAssets.ContainsKey(k.AssetId));
-
-        if (!float.IsNegativeInfinity(radius))
-        {
-            radiusStr = radius.ToString(CultureInfo.InvariantCulture);
-            if (caller is not UnturnedPlayer cPlayer)
-            {
-                SendTranslatedMessage(caller, "cannot_be_executed_from_console");
-                return Task.CompletedTask;
-            }
-
-            builds = builds.Where(k => (k.Position - cPlayer.Position).sqrMagnitude <= Mathf.Pow(radius, 2));
-        }
-
-        itemAssetName = assetCount switch
-        {
-            1 => itemAssets.First().Value.itemName,
-            > 1 => itemAssetInput,
-            _ => itemAssetName
-        };
-
-        SendTranslatedMessage(caller, "build_count", builds.Count(), itemAssetName, radiusStr, targetStr, plants,
+        SendTranslatedMessage(caller, CommandTranslationConstants.BuildCountKey, builds.Count(), itemAssetName,
+            radiusStr, targetStr, plants,
             barricades, structs);
         return Task.CompletedTask;
     }

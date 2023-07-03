@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
@@ -7,13 +8,15 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Extensions;
 
 /// <summary>
-/// Extension class for buildable directories.
+///     Extension class for buildable directories.
 /// </summary>
 [PublicAPI]
 public static class EnumerableBuildableExtensions
 {
+    private const float Tolerance = 0.1f;
+
     /// <summary>
-    /// Filters an <see cref="IEnumerable{T}"/> of <see cref="Buildable"/>s with <see cref="GetBuildableOptions"/>.
+    ///     Filters an <see cref="IEnumerable{T}" /> of <see cref="Buildable" />s with <see cref="GetBuildableOptions" />.
     /// </summary>
     /// <param name="buildables">The buildables to filter</param>
     /// <param name="options">The options to apply when filtering</param>
@@ -30,6 +33,17 @@ public static class EnumerableBuildableExtensions
 
         if (options.Group != default)
             buildables = buildables.Where(buildable => buildable.Group == options.Group);
+
+        if (Math.Abs(options.MinRange - float.MaxValue) > Tolerance && options.Position.HasValue)
+            buildables = buildables.Where(buildable =>
+                (buildable.Position - options.Position.Value).sqrMagnitude >= options.MinRange);
+
+        if (Math.Abs(options.MaxRange - float.MaxValue) > Tolerance && options.Position.HasValue)
+            buildables = buildables.Where(buildable =>
+                (buildable.Position - options.Position.Value).sqrMagnitude <= options.MaxRange);
+
+        if (options.Assets.Count > 0)
+            buildables = buildables.Where(buildable => options.Assets.Contains(buildable.AssetId));
 
         return buildables;
     }

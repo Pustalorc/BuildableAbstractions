@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -10,6 +11,7 @@ namespace Pustalorc.Libraries.BuildableAbstractions.Extensions;
 /// <summary>
 ///     A class with extensions that the plugin utilizes.
 /// </summary>
+[PublicAPI]
 public static class CommandExtensions
 {
     /// <summary>
@@ -55,8 +57,10 @@ public static class CommandExtensions
     public static List<ItemAsset> GetMultipleItemAssets(this IEnumerable<string> args, out int index)
     {
         var argsL = args.ToList();
-        var assets = Assets.find(EAssetType.ITEM).Cast<ItemAsset>()
-            .Where(k => k?.itemName != null && k.name != null).OrderBy(k => k.itemName.Length).ToList();
+        var assets = new List<ItemAsset>();
+        Assets.find(assets);
+        assets = assets.Where(k => k is { itemName: not null, name: not null }).OrderBy(k => k.itemName.Length)
+            .ToList();
 
         for (index = 0; index < argsL.Count; index++)
         {

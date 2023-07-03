@@ -1,34 +1,36 @@
-﻿using Rocket.API;
-using Rocket.API.Collections;
-using Rocket.API.Extensions;
-using Rocket.Core.Assets;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using Pustalorc.Libraries.BuildableAbstractions.Commands.Actions;
+using Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
+using Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
+using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
+using Pustalorc.Libraries.RocketModCommandsExtended.Extensions;
+using Rocket.Core.Plugins;
 
 namespace Pustalorc.Libraries.BuildableAbstractions;
 
-public class BuildableAbstractionsPlugin : MonoBehaviour, IRocketPlugin
+public sealed class BuildableAbstractionsPlugin : RocketPlugin
 {
-    public string Name { get; }
-    public PluginState State { get; }
-    public TranslationList DefaultTranslations { get; }
-    public IAsset<TranslationList> Translations { get; }
+    private List<MultiThreadedRocketCommand> Commands { get; }
 
     public BuildableAbstractionsPlugin()
     {
-        State = PluginState.Unloaded;
-        Name = "BuildableAbstractions";
-        DefaultTranslations = new TranslationList();
-        Translations = new Asset<TranslationList>();
-        State = PluginState.Loaded;
+        var translations = this.GetCurrentTranslationsForCommands();
+
+        Commands = new List<MultiThreadedRocketCommand>
+        {
+            new FindBuildsCommand(translations),
+            new RemoveBuildableCommand(translations),
+            new TeleportToBuildCommand(translations),
+            new TopBuildersCommand(translations),
+            new WreckCommand(translations),
+            new WreckVehicleCommand(translations)
+        };
+
+        Commands.LoadAndRegisterCommands(this);
     }
 
-    public T TryAddComponent<T>() where T : Component
+    protected override void Load()
     {
-        return gameObject.TryAddComponent<T>();
-    }
-
-    public void TryRemoveComponent<T>() where T : Component
-    {
-        gameObject.TryRemoveComponent<T>();
+        Commands.LoadAndRegisterCommands(this);
     }
 }

@@ -15,22 +15,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="Rocket.API">
-        <HintPath>libs\Rocket.API.dll</HintPath>
-      </Reference>
-      <Reference Include="Rocket.Core">
-        <HintPath>libs\Rocket.Core.dll</HintPath>
-      </Reference>
-      <Reference Include="Rocket.Unturned">
-        <HintPath>libs\Rocket.Unturned.dll</HintPath>
-      </Reference>
+        <Reference Include="Rocket.API">
+            <HintPath>libs\Rocket.API.dll</HintPath>
+        </Reference>
+        <Reference Include="Rocket.Core">
+            <HintPath>libs\Rocket.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="Rocket.Unturned">
+            <HintPath>libs\Rocket.Unturned.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Lib.Harmony" Version="2.2.2" />
-      <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2020.3.38" />
-      <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.3.1" />
-      <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.0" />
+        <PackageReference Include="Lib.Harmony" Version="2.2.2"/>
+        <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2020.3.38"/>
+        <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.7"/>
+        <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.1"/>
     </ItemGroup>
 
 </Project>
