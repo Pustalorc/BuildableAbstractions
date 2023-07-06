@@ -11,7 +11,14 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Patches;
 [PublicAPI]
 public static class PatchBuildablesDestroy
 {
+    /// <summary>
+    ///     An event that is raised when a barricade is destroyed.
+    /// </summary>
     public static event NelsonBuildableChange? OnBarricadeDestroyed;
+
+    /// <summary>
+    ///     An event that is raised when a structure is destroyed.
+    /// </summary>
     public static event NelsonBuildableChange? OnStructureDestroyed;
 
     [HarmonyPatch]

@@ -6,7 +6,7 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
-using Pustalorc.Libraries.BuildableAbstractions.Extensions;
+using Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Rocket.API;
 using Rocket.Unturned.Player;

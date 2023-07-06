@@ -8,10 +8,12 @@ using Rocket.Core.Plugins;
 
 namespace Pustalorc.Libraries.BuildableAbstractions;
 
+/// <inheritdoc />
 public sealed class BuildableAbstractionsPlugin : RocketPlugin
 {
     private List<MultiThreadedRocketCommand> Commands { get; }
 
+    /// <inheritdoc />
     public BuildableAbstractionsPlugin()
     {
         var translations = this.GetCurrentTranslationsForCommands();
@@ -29,6 +31,7 @@ public sealed class BuildableAbstractionsPlugin : RocketPlugin
         Commands.LoadAndRegisterCommands(this);
     }
 
+    /// <inheritdoc />
     protected override void Load()
     {
         Commands.LoadAndRegisterCommands(this);

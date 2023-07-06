@@ -13,13 +13,13 @@ using Logger = Rocket.Core.Logging.Logger;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 
-/// <summary>
-///     A default buildable directory that handles all of nelson's events, holds a basic list of all buildables in the map,
-///     indexes them, and raises events where necessary.
-/// </summary>
+/// <inheritdoc />
 [PublicAPI]
 public class DefaultBuildableDirectory : IBuildableDirectory
 {
+    /// <inheritdoc />
+    public int BuildableCount => Buildables.Count;
+
     /// <summary>
     ///     All the buildables in the game currently.
     /// </summary>
@@ -28,11 +28,19 @@ public class DefaultBuildableDirectory : IBuildableDirectory
     /// <summary>
     ///     All the barricade buildables, but indexed by Nelson's InstanceId.
     /// </summary>
+    /// <remarks>
+    ///     This cannot be merged into one dictionary with <see cref="StructureBuildable" />s as nelson does not have unique
+    ///     instance ids between both.
+    /// </remarks>
     protected Dictionary<uint, BarricadeBuildable> InstanceIdIndexedBarricades { get; }
 
     /// <summary>
     ///     All the structure buildables, but indexed by Nelson's InstanceId.
     /// </summary>
+    /// <remarks>
+    ///     This cannot be merged into one dictionary with <see cref="BarricadeBuildable" />s as nelson does not have unique
+    ///     instance ids between both.
+    /// </remarks>
     protected Dictionary<uint, StructureBuildable> InstanceIdIndexedStructures { get; }
 
     /// <summary>
@@ -72,22 +80,19 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         PatchBuildableTransforms.OnBarricadeTransformed += BarricadeTransformed;
     }
 
-    /// <summary>
-    ///     Gets all the buildables of the specified type and filters them with some options.
-    /// </summary>
-    /// <param name="options">The options to filter the results with.</param>
-    /// <typeparam name="T">The type of buildable you wish to retrieve.</typeparam>
-    /// <returns>An IEnumerable with all the buildables found.</returns>
+    /// <inheritdoc />
     public virtual IEnumerable<T> GetBuildables<T>(GetBuildableOptions options = default) where T : Buildable
     {
         return Buildables.OfType<T>().Filter(options);
     }
 
+    /// <inheritdoc />
     public virtual T? GetBuildable<T>(Transform transform) where T : Buildable
     {
         return TransformIndexedBuildables.TryGetValue(transform, out var buildable) ? buildable as T : null;
     }
 
+    /// <inheritdoc />
     public virtual T? GetBuildable<T>(uint instanceId) where T : Buildable
     {
         var typeT = typeof(T);
@@ -107,6 +112,9 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         return null;
     }
 
+    /// <summary>
+    ///     Method that hooks onto the LevelLoaded event.
+    /// </summary>
     protected virtual void LevelLoaded(int id)
     {
         var barricadeRegions = BarricadeManager.regions.Cast<BarricadeRegion>().Concat(BarricadeManager.vehicleRegions)
@@ -123,6 +131,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
             StructureSpawned(region, drop);
     }
 
+    /// <summary>
+    ///     Event hooked onto the patches for nelson's code in order to know when a structure has been destroyed.
+    /// </summary>
+    /// <param name="instanceId">The instance id of the structure destroyed.</param>
     protected virtual void StructureDestroyed(uint instanceId)
     {
         if (!InstanceIdIndexedStructures.TryGetValue(instanceId, out var buildable) ||
@@ -132,6 +144,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         BuildableDirectory.RaiseBuildableDestroyed(buildable);
     }
 
+    /// <summary>
+    ///     Event hooked onto the patches for nelson's code in order to know when a barricade has been destroyed.
+    /// </summary>
+    /// <param name="instanceId">The instance id of the barricade destroyed.</param>
     protected virtual void BarricadeDestroyed(uint instanceId)
     {
         if (!InstanceIdIndexedBarricades.TryGetValue(instanceId, out var buildable) ||
@@ -141,6 +157,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         BuildableDirectory.RaiseBuildableDestroyed(buildable);
     }
 
+    /// <summary>
+    ///     Event hooked onto the patches for nelson's code in order to know when a structure has been transformed.
+    /// </summary>
+    /// <param name="instanceId">The instance id of the structure transformed.</param>
     protected virtual void StructureTransformed(uint instanceId)
     {
         if (!InstanceIdIndexedStructures.TryGetValue(instanceId, out var buildable))
@@ -149,6 +169,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         BuildableDirectory.RaiseBuildableTransformed(buildable);
     }
 
+    /// <summary>
+    ///     Event hooked onto the patches for nelson's code in order to know when a barricade has been transformed.
+    /// </summary>
+    /// <param name="instanceId">The instance id of the barricade transformed.</param>
     protected virtual void BarricadeTransformed(uint instanceId)
     {
         if (!InstanceIdIndexedBarricades.TryGetValue(instanceId, out var buildable))
@@ -157,6 +181,11 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         BuildableDirectory.RaiseBuildableTransformed(buildable);
     }
 
+    /// <summary>
+    ///     Event hooked onto nelson's code to know when a new structure has been spawned.
+    /// </summary>
+    /// <param name="region">The region the structure was spawned in.</param>
+    /// <param name="drop">The structure that was spawned in.</param>
     protected virtual void StructureSpawned(StructureRegion region, StructureDrop drop)
     {
         var buildable = new StructureBuildable(drop);
@@ -173,6 +202,11 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         BuildableDirectory.RaiseBuildableSpawned(buildable);
     }
 
+    /// <summary>
+    ///     Event hooked onto nelson's code to know when a new barricade has been spawned.
+    /// </summary>
+    /// <param name="region">The region the barricade was spawned in.</param>
+    /// <param name="drop">The barricade that was spawned in.</param>
     protected virtual void BarricadeSpawned(BarricadeRegion region, BarricadeDrop drop)
     {
         var buildable = new BarricadeBuildable(drop);

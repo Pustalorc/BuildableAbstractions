@@ -34,7 +34,7 @@ public static class EnumerableBuildableExtensions
         if (options.Group != default)
             buildables = buildables.Where(buildable => buildable.Group == options.Group);
 
-        if (Math.Abs(options.MinRange - float.MaxValue) > Tolerance && options.Position.HasValue)
+        if (Math.Abs(options.MinRange - float.MinValue) > Tolerance && options.Position.HasValue)
             buildables = buildables.Where(buildable =>
                 (buildable.Position - options.Position.Value).sqrMagnitude >= options.MinRange);
 

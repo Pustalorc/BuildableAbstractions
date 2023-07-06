@@ -14,8 +14,14 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Patches;
 [PublicAPI]
 public static class PatchBuildableTransforms
 {
+    /// <summary>
+    ///     An event that is raised when a barricade is transformed.
+    /// </summary>
     public static event NelsonBuildableChange? OnBarricadeTransformed;
 
+    /// <summary>
+    ///     An event that is raised when a structure is transformed.
+    /// </summary>
     public static event NelsonBuildableChange? OnStructureTransformed;
 
     [HarmonyPatch]
