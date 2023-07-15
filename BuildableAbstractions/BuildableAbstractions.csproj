@@ -32,6 +32,8 @@
         <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2020.3.38"/>
         <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.8"/>
         <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.1"/>
+        <PackageReference Include="Pustalorc.RocketModServices" Version="1.0.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" Aliases="JetBrains.Annotations"/>
     </ItemGroup>
 
 </Project>

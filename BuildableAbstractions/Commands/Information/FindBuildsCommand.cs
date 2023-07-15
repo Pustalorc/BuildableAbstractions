@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
+using Pustalorc.Libraries.RocketModServices.Services;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using UnityEngine;
@@ -114,11 +115,11 @@ internal sealed class FindBuildsCommand : RocketCommandWithTranslations
         IEnumerable<Buildable> builds;
 
         if (barricades)
-            builds = BuildableDirectory.Instance.GetBuildables<BarricadeBuildable>(options);
+            builds = RocketModService<IBuildableDirectory>.GetService().GetBuildables<BarricadeBuildable>(options);
         else if (structs)
-            builds = BuildableDirectory.Instance.GetBuildables<StructureBuildable>(options);
+            builds = RocketModService<IBuildableDirectory>.GetService().GetBuildables<StructureBuildable>(options);
         else
-            builds = BuildableDirectory.Instance.GetBuildables<Buildable>(options);
+            builds = RocketModService<IBuildableDirectory>.GetService().GetBuildables<Buildable>(options);
 
         SendTranslatedMessage(caller, CommandTranslationConstants.BuildCountKey, builds.Count(), itemAssetName,
             radiusStr, targetStr, plants,

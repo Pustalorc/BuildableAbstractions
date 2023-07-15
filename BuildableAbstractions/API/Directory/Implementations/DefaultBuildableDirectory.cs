@@ -3,10 +3,15 @@ using System.Linq;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
-using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Patches;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Destroy;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Spawn;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Transform;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Extensions;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
+using Pustalorc.Libraries.BuildableAbstractions.API.Patches;
+using Pustalorc.Libraries.RocketModServices.Events.Bus;
+using Pustalorc.Libraries.RocketModServices.Services;
 using SDG.Unturned;
 using UnityEngine;
 using Logger = Rocket.Core.Logging.Logger;
@@ -58,6 +63,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
     /// </remarks>
     public DefaultBuildableDirectory()
     {
+        RocketModService<IBuildableDirectory>.RegisterService(this);
         Buildables = new List<Buildable>();
         InstanceIdIndexedBarricades = new Dictionary<uint, BarricadeBuildable>();
         InstanceIdIndexedStructures = new Dictionary<uint, StructureBuildable>();
@@ -141,7 +147,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
             !InstanceIdIndexedStructures.Remove(instanceId))
             return;
 
-        BuildableDirectory.RaiseBuildableDestroyed(buildable);
+        EventBus.Publish<BuildableDestroyedEvent>(new BuildableDestroyedEventArguments(buildable));
     }
 
     /// <summary>
@@ -154,7 +160,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
             !InstanceIdIndexedBarricades.Remove(instanceId))
             return;
 
-        BuildableDirectory.RaiseBuildableDestroyed(buildable);
+        EventBus.Publish<BuildableDestroyedEvent>(new BuildableDestroyedEventArguments(buildable));
     }
 
     /// <summary>
@@ -166,7 +172,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!InstanceIdIndexedStructures.TryGetValue(instanceId, out var buildable))
             return;
 
-        BuildableDirectory.RaiseBuildableTransformed(buildable);
+        EventBus.Publish<BuildableTransformedEvent>(new BuildableTransformedEventArguments(buildable));
     }
 
     /// <summary>
@@ -178,7 +184,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!InstanceIdIndexedBarricades.TryGetValue(instanceId, out var buildable))
             return;
 
-        BuildableDirectory.RaiseBuildableTransformed(buildable);
+        EventBus.Publish<BuildableTransformedEvent>(new BuildableTransformedEventArguments(buildable));
     }
 
     /// <summary>
@@ -199,7 +205,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
             Logger.LogWarning(
                 $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
-        BuildableDirectory.RaiseBuildableSpawned(buildable);
+        EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
     }
 
     /// <summary>
@@ -220,6 +226,6 @@ public class DefaultBuildableDirectory : IBuildableDirectory
             Logger.LogWarning(
                 $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
-        BuildableDirectory.RaiseBuildableSpawned(buildable);
+        EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
     }
 }

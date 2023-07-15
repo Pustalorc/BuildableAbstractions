@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
+using Pustalorc.Libraries.RocketModServices.Services;
 using Rocket.API;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
@@ -37,8 +38,8 @@ internal sealed class TopBuildersCommand : RocketCommandWithTranslations
         if (index > -1)
             args.RemoveAt(index);
 
-        var builds =
-            BuildableDirectory.Instance.GetBuildables<Buildable>(new GetBuildableOptions(default, default, plants));
+        var builds = RocketModService<IBuildableDirectory>.GetService()
+            .GetBuildables<Buildable>(new GetBuildableOptions(default, default, plants));
 
         var topBuilders = builds.GroupBy(k => k.Owner).OrderByDescending(k => k.Count()).Take(5).ToList();
 

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
+using Pustalorc.Libraries.RocketModServices.Services;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -44,7 +45,7 @@ internal sealed class RemoveBuildableCommand : RocketCommandWithTranslations
             return Task.CompletedTask;
         }
 
-        var buildable = BuildableDirectory.Instance.GetBuildable<Buildable>(hit.transform);
+        var buildable = RocketModService<IBuildableDirectory>.GetService().GetBuildable<Buildable>(hit.transform);
         if (buildable == null)
         {
             SendTranslatedMessage(caller, CommandTranslationConstants.NotLookingBuildableKey);
