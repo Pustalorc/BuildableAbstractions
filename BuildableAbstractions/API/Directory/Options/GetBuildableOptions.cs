@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
+using Pustalorc.Libraries.RocketModServices.Services;
 using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
@@ -11,6 +14,12 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 [PublicAPI]
 public readonly struct GetBuildableOptions
 {
+    static GetBuildableOptions()
+    {
+        if (RocketModService<IBuildableDirectory>.TryGetService() == default)
+            RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
+    }
+
     /// <summary>
     ///     The owner to filter by. This should be the Steam64ID of the owner.
     /// </summary>

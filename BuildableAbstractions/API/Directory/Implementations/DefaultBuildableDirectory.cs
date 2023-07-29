@@ -22,6 +22,12 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementation
 [PublicAPI]
 public class DefaultBuildableDirectory : IBuildableDirectory
 {
+    static DefaultBuildableDirectory()
+    {
+        if (RocketModService<IBuildableDirectory>.TryGetService() == default)
+            RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
+    }
+
     /// <inheritdoc />
     public int BuildableCount => Buildables.Count;
 
@@ -63,7 +69,6 @@ public class DefaultBuildableDirectory : IBuildableDirectory
     /// </remarks>
     public DefaultBuildableDirectory()
     {
-        RocketModService<IBuildableDirectory>.RegisterService(this);
         Buildables = new List<Buildable>();
         InstanceIdIndexedBarricades = new Dictionary<uint, BarricadeBuildable>();
         InstanceIdIndexedStructures = new Dictionary<uint, StructureBuildable>();
