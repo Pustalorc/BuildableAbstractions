@@ -16,7 +16,8 @@ using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
 
-internal sealed class WreckCommand : RocketCommandWithTranslations
+internal sealed class WreckCommand(Dictionary<string, string> translations)
+    : RocketCommandWithTranslations(true, translations)
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Both;
     public override string Name => "wreck";
@@ -25,7 +26,7 @@ internal sealed class WreckCommand : RocketCommandWithTranslations
     public override string Syntax =>
         "confirm | abort | b [radius] | s [radius] | <item> [radius] | v [item] [radius] | <player> [item] [radius]";
 
-    public override List<string> Aliases => new() { "w" };
+    public override List<string> Aliases => ["w"];
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
@@ -33,12 +34,7 @@ internal sealed class WreckCommand : RocketCommandWithTranslations
         { CommandTranslationConstants.TopBuilderFormatKey, CommandTranslationConstants.TopBuilderFormatValue }
     };
 
-    private Dictionary<string, WreckAction> WreckActions { get; }
-
-    public WreckCommand(Dictionary<string, string> translations) : base(true, translations)
-    {
-        WreckActions = new Dictionary<string, WreckAction>();
-    }
+    private Dictionary<string, WreckAction> WreckActions { get; } = new();
 
     public override async Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {
@@ -198,7 +194,7 @@ internal sealed class WreckCommand : RocketCommandWithTranslations
             _ => itemAssetName
         };
 
-        var assets = itemAssets.Select(itemAsset => itemAsset.id).ToHashSet();
+        var assets = itemAssets.Select(static itemAsset => itemAsset.id).ToHashSet();
         var count = (await GetBuildablesToWreck(barricades, structs, owner, plants, maxRadius, center, assets)).Count();
         if (count <= 0)
         {

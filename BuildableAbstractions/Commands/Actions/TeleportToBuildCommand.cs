@@ -14,14 +14,15 @@ using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Actions;
 
-internal sealed class TeleportToBuildCommand : RocketCommandWithTranslations
+internal sealed class TeleportToBuildCommand(Dictionary<string, string> translations)
+    : RocketCommandWithTranslations(true, translations)
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Player;
     public override string Name => "teleportToBuild";
     public override string Help => "Teleports you to a random buildable on the map based on filters.";
     public override string Syntax => "b [player] | s [player] | v [player] | [player] [id]";
 
-    public override List<string> Aliases => new() { "tpb" };
+    public override List<string> Aliases => ["tpb"];
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
@@ -36,10 +37,6 @@ internal sealed class TeleportToBuildCommand : RocketCommandWithTranslations
             CommandTranslationConstants.CannotTeleportBuildsTooCloseValue
         }
     };
-
-    public TeleportToBuildCommand(Dictionary<string, string> translations) : base(true, translations)
-    {
-    }
 
     public override Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {
@@ -98,7 +95,7 @@ internal sealed class TeleportToBuildCommand : RocketCommandWithTranslations
         }
 
         var options = new GetBuildableOptions(owner, default, plants, float.MaxValue, minRange, player.Position,
-            itemAssets.Select(itemAsset => itemAsset.id).ToHashSet());
+            itemAssets.Select(static itemAsset => itemAsset.id).ToHashSet());
         IEnumerable<Buildable> builds;
 
         if (barricades)

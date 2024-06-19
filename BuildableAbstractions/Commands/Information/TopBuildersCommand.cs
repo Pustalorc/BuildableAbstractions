@@ -11,24 +11,21 @@ using Rocket.API;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
 
-internal sealed class TopBuildersCommand : RocketCommandWithTranslations
+internal sealed class TopBuildersCommand(Dictionary<string, string> translations)
+    : RocketCommandWithTranslations(true, translations)
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Both;
     public override string Name => "topBuilders";
     public override string Help => "Displays the top 5 builders in the game.";
     public override string Syntax => "v";
 
-    public override List<string> Aliases => new() { "topB" };
+    public override List<string> Aliases => ["topB"];
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
         { TranslationKeys.CommandExceptionKey, CommandTranslationConstants.CommandExceptionValue },
         { CommandTranslationConstants.TopBuilderFormatKey, CommandTranslationConstants.TopBuilderFormatValue }
     };
-
-    public TopBuildersCommand(Dictionary<string, string> translations) : base(true, translations)
-    {
-    }
 
     public override Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {
@@ -41,7 +38,7 @@ internal sealed class TopBuildersCommand : RocketCommandWithTranslations
         var builds = RocketModService<IBuildableDirectory>.GetService()
             .GetBuildables<Buildable>(new GetBuildableOptions(default, default, plants));
 
-        var topBuilders = builds.GroupBy(k => k.Owner).OrderByDescending(k => k.Count()).Take(5).ToList();
+        var topBuilders = builds.GroupBy(static k => k.Owner).OrderByDescending(static k => k.Count()).Take(5).ToList();
 
         for (var i = 0; i < topBuilders.Count; i++)
         {

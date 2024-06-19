@@ -8,6 +8,4 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Destroy
 ///     An event that is raised when a buildable is destroyed.
 /// </summary>
 [PublicAPI]
-public class BuildableDestroyedEvent : Event<BuildableDestroyedEventArguments>
-{
-}
+public class BuildableDestroyedEvent : Event<BuildableDestroyedEventArguments>;

@@ -26,7 +26,7 @@ public static class EnumerableBuildableExtensions
         where T : Buildable
     {
         if (!options.IncludeOnVehicles)
-            buildables = buildables.Where(buildable => !buildable.IsPlanted);
+            buildables = buildables.Where(static buildable => !buildable.IsPlanted);
 
         if (options.Owner != default)
             buildables = buildables.Where(buildable => buildable.Owner == options.Owner);

@@ -8,24 +8,21 @@ using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
 
-internal sealed class WreckVehicleCommand : RocketCommandWithTranslations
+internal sealed class WreckVehicleCommand(Dictionary<string, string> translations)
+    : RocketCommandWithTranslations(true, translations)
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Player;
     public override string Name => "wreckVehicle";
     public override string Help => "Wrecks all the buildables on the vehicle that you are looking at.";
     public override string Syntax => "";
 
-    public override List<string> Aliases => new() { "wv" };
+    public override List<string> Aliases => ["wv"];
 
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
         { TranslationKeys.CommandExceptionKey, CommandTranslationConstants.CommandExceptionValue }
     };
-
-    public WreckVehicleCommand(Dictionary<string, string> translations) : base(true, translations)
-    {
-    }
 
     public override Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {

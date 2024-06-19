@@ -15,7 +15,8 @@ using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
 
-internal sealed class FindBuildsCommand : RocketCommandWithTranslations
+internal sealed class FindBuildsCommand(Dictionary<string, string> translations)
+    : RocketCommandWithTranslations(true, translations)
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Both;
     public override string Name => "findBuilds";
@@ -24,7 +25,7 @@ internal sealed class FindBuildsCommand : RocketCommandWithTranslations
     public override string Syntax =>
         "b [radius] | s [radius] | [id] [radius] | v [id] [radius] | [player] [id] [radius] | [player] b [radius] | [player] s [radius] | [player] v [id] [radius]";
 
-    public override List<string> Aliases => new() { "fb" };
+    public override List<string> Aliases => ["fb"];
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
@@ -36,10 +37,6 @@ internal sealed class FindBuildsCommand : RocketCommandWithTranslations
         },
         { CommandTranslationConstants.BuildCountKey, CommandTranslationConstants.BuildCountValue }
     };
-
-    public FindBuildsCommand(Dictionary<string, string> translations) : base(true, translations)
-    {
-    }
 
     public override Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {
@@ -111,7 +108,7 @@ internal sealed class FindBuildsCommand : RocketCommandWithTranslations
         }
 
         var options = new GetBuildableOptions(owner, default, plants, maxRange, float.MinValue, position,
-            itemAssets.Select(itemAsset => itemAsset.id).ToHashSet());
+            itemAssets.Select(static itemAsset => itemAsset.id).ToHashSet());
         IEnumerable<Buildable> builds;
 
         if (barricades)

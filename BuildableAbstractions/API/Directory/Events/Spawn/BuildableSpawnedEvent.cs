@@ -8,6 +8,4 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Spawn;
 ///     An event that is raised when a buildable is spawned.
 /// </summary>
 [PublicAPI]
-public class BuildableSpawnedEvent : Event<BuildableSpawnedEventArguments>
-{
-}
+public class BuildableSpawnedEvent : Event<BuildableSpawnedEventArguments>;

@@ -11,24 +11,21 @@ using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Actions;
 
-internal sealed class RemoveBuildableCommand : RocketCommandWithTranslations
+internal sealed class RemoveBuildableCommand(Dictionary<string, string> translations)
+    : RocketCommandWithTranslations(true, translations)
 {
     public override AllowedCaller AllowedCaller => AllowedCaller.Player;
     public override string Name => "removeBuildable";
     public override string Help => "Removes the buildable you are staring at";
     public override string Syntax => "";
 
-    public override List<string> Aliases => new() { "rb" };
+    public override List<string> Aliases => ["rb"];
 
     public override Dictionary<string, string> DefaultTranslations => new()
     {
         { TranslationKeys.CommandExceptionKey, CommandTranslationConstants.CommandExceptionValue },
         { CommandTranslationConstants.NotLookingBuildableKey, CommandTranslationConstants.NotLookingBuildableValue }
     };
-
-    public RemoveBuildableCommand(Dictionary<string, string> translations) : base(true, translations)
-    {
-    }
 
     public override Task ExecuteAsync(IRocketPlayer caller, string[] command)
     {

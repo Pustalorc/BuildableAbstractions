@@ -8,6 +8,4 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Transfo
 ///     An event that is raised when a buildable is transformed.
 /// </summary>
 [PublicAPI]
-public class BuildableTransformedEvent : Event<BuildableTransformedEventArguments>
-{
-}
+public class BuildableTransformedEvent : Event<BuildableTransformedEventArguments>;
