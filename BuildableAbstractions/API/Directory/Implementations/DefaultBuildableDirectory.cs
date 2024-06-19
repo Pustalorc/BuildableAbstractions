@@ -11,7 +11,6 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.API.Patches;
 using Pustalorc.Libraries.RocketModServices.Events.Bus;
-using Pustalorc.Libraries.RocketModServices.Services;
 using SDG.Unturned;
 using UnityEngine;
 using Logger = Rocket.Core.Logging.Logger;
@@ -22,12 +21,6 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementation
 [PublicAPI]
 public class DefaultBuildableDirectory : IBuildableDirectory
 {
-    static DefaultBuildableDirectory()
-    {
-        if (RocketModService<IBuildableDirectory>.TryGetService() == default)
-            RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
-    }
-
     /// <inheritdoc />
     public int BuildableCount => Buildables.Count;
 

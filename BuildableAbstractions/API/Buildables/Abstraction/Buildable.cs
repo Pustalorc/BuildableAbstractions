@@ -2,6 +2,9 @@
 using System.Threading;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
+using Pustalorc.Libraries.RocketModServices.Services;
 using Rocket.Core.Utils;
 using SDG.Unturned;
 using UnityEngine;
@@ -115,6 +118,12 @@ public abstract class Buildable
     /// </remarks>
     public abstract bool IsPlanted { get; }
 
+    static Buildable()
+    {
+        if (RocketModService<IBuildableDirectory>.TryGetService() == default)
+            RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
+    }
+
     /// <summary>
     ///     Destroys this buildable without checking if we are on the main thread.
     /// </summary>
@@ -129,7 +138,7 @@ public abstract class Buildable
     /// </summary>
     public virtual void SafeDestroy()
     {
-        if (!Thread.CurrentThread.IsGameThread())
+        if (Thread.CurrentThread != ThreadUtil.gameThread)
         {
             TaskDispatcher.QueueOnMainThread(UnsafeDestroy);
             return;
@@ -159,7 +168,7 @@ public abstract class Buildable
     /// </remarks>
     public virtual void SafeDamage(ushort damage)
     {
-        if (!Thread.CurrentThread.IsGameThread())
+        if (Thread.CurrentThread != ThreadUtil.gameThread)
         {
             TaskDispatcher.QueueOnMainThread(() => UnsafeDamage(damage));
             return;
@@ -189,7 +198,7 @@ public abstract class Buildable
     /// </remarks>
     public virtual void SafeHeal(ushort amount)
     {
-        if (!Thread.CurrentThread.IsGameThread())
+        if (Thread.CurrentThread != ThreadUtil.gameThread)
         {
             TaskDispatcher.QueueOnMainThread(() => UnsafeHeal(amount));
             return;
