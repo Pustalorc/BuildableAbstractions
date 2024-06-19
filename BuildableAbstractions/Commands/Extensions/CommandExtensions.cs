@@ -57,7 +57,8 @@ internal static class CommandExtensions
         var argsL = args.ToList();
         var assets = new List<ItemAsset>();
         Assets.find(assets);
-        assets = assets.Where(static k => k is { itemName: not null, name: not null }).OrderBy(static k => k.itemName.Length)
+        assets = assets.Where(static k => k is { itemName: not null, name: not null })
+            .OrderBy(static k => k.itemName.Length)
             .ToList();
 
         for (index = 0; index < argsL.Count; index++)

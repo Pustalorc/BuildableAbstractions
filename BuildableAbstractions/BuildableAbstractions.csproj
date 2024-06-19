@@ -28,12 +28,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Lib.Harmony" Version="2.3.3" />
-        <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2021.3.29.1" />
-        <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.12.3" />
+        <PackageReference Include="Lib.Harmony" Version="2.3.3"/>
+        <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2021.3.29.1"/>
+        <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.12.3"/>
         <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.1"/>
         <PackageReference Include="Pustalorc.RocketModServices" Version="1.0.0"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" Aliases="JetBrainsAnnotations" />
+        <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" Aliases="JetBrainsAnnotations"/>
     </ItemGroup>
 
 </Project>
