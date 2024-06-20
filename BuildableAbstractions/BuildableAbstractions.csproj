@@ -17,13 +17,13 @@
 
     <ItemGroup>
         <Reference Include="Rocket.API">
-            <HintPath>libs\Rocket.API.dll</HintPath>
+            <HintPath>..\libs\Rocket.API.dll</HintPath>
         </Reference>
         <Reference Include="Rocket.Core">
-            <HintPath>libs\Rocket.Core.dll</HintPath>
+            <HintPath>..\libs\Rocket.Core.dll</HintPath>
         </Reference>
         <Reference Include="Rocket.Unturned">
-            <HintPath>libs\Rocket.Unturned.dll</HintPath>
+            <HintPath>..\libs\Rocket.Unturned.dll</HintPath>
         </Reference>
     </ItemGroup>
 
@@ -34,6 +34,10 @@
         <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.1"/>
         <PackageReference Include="Pustalorc.RocketModServices" Version="1.0.0"/>
         <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" Aliases="JetBrainsAnnotations"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BuildableAbstractions.API\BuildableAbstractions.API.csproj" />
     </ItemGroup>
 
 </Project>
