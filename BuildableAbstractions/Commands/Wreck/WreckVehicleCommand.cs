@@ -6,7 +6,7 @@ using Rocket.Unturned.Player;
 using SDG.Unturned;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Wreck;
 
 internal sealed class WreckVehicleCommand(Dictionary<string, string> translations)
     : RocketCommandWithTranslations(true, translations)

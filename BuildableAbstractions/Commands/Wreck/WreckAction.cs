@@ -4,7 +4,7 @@ using Rocket.API;
 using SDG.Unturned;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Wreck;
 
 /// <summary>
 ///     A wreck action for a collection of <see cref="Buildable" />s.

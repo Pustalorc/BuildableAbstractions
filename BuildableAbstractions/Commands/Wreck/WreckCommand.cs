@@ -6,15 +6,15 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
-using Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Pustalorc.Libraries.RocketModServices.Services;
+using Pustalorc.Plugins.BuildableAbstractions.Commands.Extensions;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Wreck;
 
 internal sealed class WreckCommand(Dictionary<string, string> translations)
     : RocketCommandWithTranslations(true, translations)

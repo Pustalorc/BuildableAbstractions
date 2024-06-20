@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
-using Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Pustalorc.Libraries.RocketModServices.Services;
+using Pustalorc.Plugins.BuildableAbstractions.Commands.Extensions;
 using Rocket.API;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Information;
 
 internal sealed class TopBuildersCommand(Dictionary<string, string> translations)
     : RocketCommandWithTranslations(true, translations)

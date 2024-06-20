@@ -3,15 +3,17 @@
     <PropertyGroup>
         <TargetFramework>net481</TargetFramework>
         <Nullable>enable</Nullable>
+        <Product>Pustalorc.BuildableAbstractions</Product>
         <AssemblyName>Pustalorc.BuildableAbstractions</AssemblyName>
-        <RootNamespace>Pustalorc.Libraries.BuildableAbstractions</RootNamespace>
+        <AssemblyTitle>Pustalorc.BuildableAbstractions</AssemblyTitle>
+        <RootNamespace>Pustalorc.Plugins.BuildableAbstractions</RootNamespace>
         <LangVersion>12</LangVersion>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageId>Pustalorc.BuildableAbstractions</PackageId>
         <Authors>Pustalorc</Authors>
         <Company>Pustalorc</Company>
+        <Copyright>Copyright © Pustalorc 2024</Copyright>
         <AssemblyVersion>1.0.0</AssemblyVersion>
         <FileVersion>1.0.0</FileVersion>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -28,7 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Lib.Harmony" Version="2.3.3"/>
         <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2021.3.29.1"/>
         <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.12.3"/>
         <PackageReference Include="Pustalorc.RocketModExtended.Commands" Version="1.2.1"/>
@@ -37,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BuildableAbstractions.API\BuildableAbstractions.API.csproj" />
+        <ProjectReference Include="..\BuildableAbstractions.API\BuildableAbstractions.API.csproj"/>
     </ItemGroup>
 
 </Project>

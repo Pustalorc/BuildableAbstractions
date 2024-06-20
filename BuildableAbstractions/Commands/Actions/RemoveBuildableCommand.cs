@@ -9,7 +9,7 @@ using Rocket.Unturned.Player;
 using SDG.Unturned;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Actions;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Actions;
 
 internal sealed class RemoveBuildableCommand(Dictionary<string, string> translations)
     : RocketCommandWithTranslations(true, translations)

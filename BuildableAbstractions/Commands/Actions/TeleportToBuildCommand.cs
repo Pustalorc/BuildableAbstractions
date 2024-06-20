@@ -5,14 +5,14 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
-using Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Pustalorc.Libraries.RocketModServices.Services;
+using Pustalorc.Plugins.BuildableAbstractions.Commands.Extensions;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using UnityEngine;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Actions;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Actions;
 
 internal sealed class TeleportToBuildCommand(Dictionary<string, string> translations)
     : RocketCommandWithTranslations(true, translations)

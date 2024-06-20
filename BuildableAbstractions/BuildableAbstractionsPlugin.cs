@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
-using Pustalorc.Libraries.BuildableAbstractions.Commands.Actions;
-using Pustalorc.Libraries.BuildableAbstractions.Commands.Information;
-using Pustalorc.Libraries.BuildableAbstractions.Commands.Wreck;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Extensions;
 using Pustalorc.Libraries.RocketModServices.Services;
+using Pustalorc.Plugins.BuildableAbstractions.Commands.Actions;
+using Pustalorc.Plugins.BuildableAbstractions.Commands.Information;
+using Pustalorc.Plugins.BuildableAbstractions.Commands.Wreck;
 using Rocket.Core.Plugins;
 
-namespace Pustalorc.Libraries.BuildableAbstractions;
+namespace Pustalorc.Plugins.BuildableAbstractions;
 
 /// <inheritdoc />
 public sealed class BuildableAbstractionsPlugin : RocketPlugin

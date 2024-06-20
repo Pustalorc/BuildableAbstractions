@@ -1,4 +1,4 @@
-﻿namespace Pustalorc.Libraries.BuildableAbstractions.Commands;
+﻿namespace Pustalorc.Plugins.BuildableAbstractions.Commands;
 
 internal static class CommandTranslationConstants
 {

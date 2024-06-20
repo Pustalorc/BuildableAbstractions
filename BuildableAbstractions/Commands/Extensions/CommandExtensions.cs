@@ -5,7 +5,7 @@ using Rocket.API;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 
-namespace Pustalorc.Libraries.BuildableAbstractions.Commands.Extensions;
+namespace Pustalorc.Plugins.BuildableAbstractions.Commands.Extensions;
 
 /// <summary>
 ///     A class with extensions for the commands
