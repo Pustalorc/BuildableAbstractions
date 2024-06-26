@@ -2,9 +2,6 @@
 using System.Threading;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
-using Pustalorc.Libraries.RocketModServices.Services;
 using Rocket.Core.Utils;
 using SDG.Unturned;
 using UnityEngine;
@@ -28,7 +25,7 @@ public abstract class Buildable
     // Barricade.cs / Structure.cs
 
     /// <summary>
-    ///     The Id of the Asset of this buildable.
+    ///     The ID of the Asset of this buildable.
     /// </summary>
     public abstract ushort AssetId { get; }
 
@@ -98,7 +95,7 @@ public abstract class Buildable
     // Multiple Files
 
     /// <summary>
-    ///     The unique instance Id of this buildable, set by unturned.
+    ///     The unique instance ID of this buildable, set by unturned.
     /// </summary>
     public abstract uint InstanceId { get; }
 
@@ -114,21 +111,15 @@ public abstract class Buildable
     ///     This determines if the buildable is planted (on a vehicle).
     /// </summary>
     /// <remarks>
-    ///     This will always return <see langword="false" /> if its a <see cref="StructureBuildable" />.
+    ///     This will always return <see langword="false" /> if it is a <see cref="StructureBuildable" />.
     /// </remarks>
     public abstract bool IsPlanted { get; }
-
-    static Buildable()
-    {
-        if (RocketModService<IBuildableDirectory>.TryGetService() == default)
-            RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
-    }
 
     /// <summary>
     ///     Destroys this buildable without checking if we are on the main thread.
     /// </summary>
     /// <remarks>
-    ///     If this method is ran on a separate thread and there's another read/write operation happening at the same time that
+    ///     If this method is run on a separate thread and there's another read/write operation happening at the same time that
     ///     we are destroying, the game will crash.
     /// </remarks>
     public abstract void UnsafeDestroy();
@@ -152,7 +143,7 @@ public abstract class Buildable
     /// </summary>
     /// <param name="damage">The amount of damage to apply to the buildable.</param>
     /// <remarks>
-    ///     If this method is ran on a separate thread and there's another read/write operation happening at the same time that
+    ///     If this method is run on a separate thread and there's another read/write operation happening at the same time that
     ///     we are damaging (and possibly destroying), the game will crash.
     ///     <br />
     ///     <paramref name="damage" /> is in raw damage, not a percentage of max health.
@@ -182,7 +173,7 @@ public abstract class Buildable
     /// </summary>
     /// <param name="amount">The amount of healing to apply to the buildable.</param>
     /// <remarks>
-    ///     If this method is ran on a separate thread and there's another read/write operation happening at the same time that
+    ///     If this method is run on a separate thread and there's another read/write operation happening at the same time that
     ///     we are healing, there's a high chance that the game will crash.
     ///     <br />
     ///     <paramref name="amount" /> is in raw healing, not a percentage of max health.

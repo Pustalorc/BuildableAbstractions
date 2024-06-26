@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
-using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
-using Pustalorc.Libraries.RocketModServices.Services;
 using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
@@ -14,12 +11,6 @@ namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 [PublicAPI]
 public readonly struct GetBuildableOptions
 {
-    static GetBuildableOptions()
-    {
-        if (RocketModService<IBuildableDirectory>.TryGetService() == default)
-            RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
-    }
-
     /// <summary>
     ///     The owner to filter by. This should be the Steam64ID of the owner.
     /// </summary>
@@ -59,7 +50,7 @@ public readonly struct GetBuildableOptions
     /// <summary>
     ///     A <see cref="HashSet{T}" /> of asset ids to filter by.
     /// </summary>
-    public HashSet<ushort> Assets { get; }
+    public HashSet<ushort>? Assets { get; }
 
     /// <summary>
     ///     Creates an instance of the options with the default values.
@@ -93,5 +84,19 @@ public readonly struct GetBuildableOptions
         Position = position;
 
         Assets = assets ?? new HashSet<ushort>();
+    }
+
+    /// <summary>
+    /// Generates the struct with the default values
+    /// </summary>
+    public GetBuildableOptions()
+    {
+        Owner = default;
+        Group = default;
+        IncludeOnVehicles = default;
+        MaxRange = float.MaxValue;
+        MinRange = float.MinValue;
+        Position = default;
+        Assets = new HashSet<ushort>();
     }
 }

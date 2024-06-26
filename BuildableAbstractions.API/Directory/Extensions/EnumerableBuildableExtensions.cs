@@ -42,7 +42,7 @@ public static class EnumerableBuildableExtensions
             buildables = buildables.Where(buildable =>
                 (buildable.Position - options.Position.Value).sqrMagnitude <= options.MaxRange);
 
-        if (options.Assets.Count > 0)
+        if (options.Assets is { Count: > 0 })
             buildables = buildables.Where(buildable => options.Assets.Contains(buildable.AssetId));
 
         return buildables;

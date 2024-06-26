@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using Pustalorc.Libraries.BuildableAbstractions.API.BuildableChangeDelayer.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Destroy;
@@ -10,16 +11,19 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Extensions;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.API.Patches;
+using Pustalorc.Libraries.Logging.API.Loggers.Configuration.Implementations;
+using Pustalorc.Libraries.Logging.API.Loggers.Configuration.Interfaces;
+using Pustalorc.Libraries.Logging.API.LogLevels.Implementations;
+using Pustalorc.Libraries.Logging.API.Manager;
 using Pustalorc.Libraries.RocketModServices.Events.Bus;
 using SDG.Unturned;
 using UnityEngine;
-using Logger = Rocket.Core.Logging.Logger;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 
-/// <inheritdoc />
+/// <inheritdoc cref="Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces.IBuildableDirectory" />
 [PublicAPI]
-public class DefaultBuildableDirectory : IBuildableDirectory
+public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire, IBuildableDirectory
 {
     /// <inheritdoc />
     public int BuildableCount => Buildables.Count;
@@ -52,6 +56,12 @@ public class DefaultBuildableDirectory : IBuildableDirectory
     /// </summary>
     protected Dictionary<Transform, Buildable> TransformIndexedBuildables { get; }
 
+    private class LogConfiguration : ILoggerConfiguration
+    {
+        public byte MaxLogLevel => LogLevel.Debug.Level;
+    }
+
+    /// <inheritdoc />
     /// <summary>
     ///     The constructor for the directory.
     /// </summary>
@@ -66,22 +76,7 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         InstanceIdIndexedBarricades = new Dictionary<uint, BarricadeBuildable>();
         InstanceIdIndexedStructures = new Dictionary<uint, StructureBuildable>();
         TransformIndexedBuildables = new Dictionary<Transform, Buildable>();
-
-        if (Level.isLoaded)
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // Force call in case that this class is instantiated post-level load.
-            // This should not be needed, but is there just in-case.
-            // For implementations overriding this class, they should still call this overriden method this way to avoid issues.
-            LevelLoaded(0);
-        else
-            Level.onPostLevelLoaded += LevelLoaded;
-
-        StructureManager.onStructureSpawned += StructureSpawned;
-        BarricadeManager.onBarricadeSpawned += BarricadeSpawned;
-        PatchBuildablesDestroy.OnStructureDestroyed += StructureDestroyed;
-        PatchBuildablesDestroy.OnBarricadeDestroyed += BarricadeDestroyed;
-        PatchBuildableTransforms.OnStructureTransformed += StructureTransformed;
-        PatchBuildableTransforms.OnBarricadeTransformed += BarricadeTransformed;
+        LogManager.UpdateConfiguration(new LogConfiguration());
     }
 
     /// <inheritdoc />
@@ -116,11 +111,31 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         return null;
     }
 
+    /// <inheritdoc />
+    public virtual void Load()
+    {
+        if (Level.isLoaded)
+            LevelLoaded(0);
+        else
+            Level.onPostLevelLoaded += LevelLoaded;
+    }
+
+    /// <inheritdoc />
+    public virtual void Unload()
+    {
+        Level.onPostLevelLoaded -= LevelLoaded;
+        UnhookFromEvents();
+    }
+
     /// <summary>
     ///     Method that hooks onto the LevelLoaded event.
     /// </summary>
     protected virtual void LevelLoaded(int id)
     {
+        LogManager.Debug("Level loaded, hooking onto unturned events...");
+        HookToEvents();
+
+        LogManager.Debug("Registering and tracking all barricades...");
         var barricadeRegions = BarricadeManager.regions.Cast<BarricadeRegion>().Concat(BarricadeManager.vehicleRegions)
             .ToList();
 
@@ -128,11 +143,43 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         foreach (var drop in region.drops)
             BarricadeSpawned(region, drop);
 
+        LogManager.Debug("All barricades registered!");
+
+        LogManager.Debug("Registering and tracking all structures...");
         var structureRegions = StructureManager.regions.Cast<StructureRegion>().ToList();
 
         foreach (var region in structureRegions)
         foreach (var drop in region.drops)
             StructureSpawned(region, drop);
+        LogManager.Debug("All structures registered!");
+
+        LogManager.Information("Finished loading everything.");
+    }
+
+    /// <inheritdoc />
+    public override void HookToEvents()
+    {
+        base.HookToEvents();
+
+        StructureManager.onStructureSpawned += StructureSpawned;
+        BarricadeManager.onBarricadeSpawned += BarricadeSpawned;
+        PatchBuildablesDestroy.OnStructureDestroyed += StructureDestroyed;
+        PatchBuildablesDestroy.OnBarricadeDestroyed += BarricadeDestroyed;
+        PatchBuildableTransforms.OnStructureTransformed += StructureTransformed;
+        PatchBuildableTransforms.OnBarricadeTransformed += BarricadeTransformed;
+    }
+
+    /// <inheritdoc />
+    public override void UnhookFromEvents()
+    {
+        PatchBuildableTransforms.OnBarricadeTransformed -= BarricadeTransformed;
+        PatchBuildableTransforms.OnStructureTransformed -= StructureTransformed;
+        PatchBuildablesDestroy.OnBarricadeDestroyed -= BarricadeDestroyed;
+        PatchBuildablesDestroy.OnStructureDestroyed -= StructureDestroyed;
+        BarricadeManager.onBarricadeSpawned -= BarricadeSpawned;
+        StructureManager.onStructureSpawned -= StructureSpawned;
+
+        base.UnhookFromEvents();
     }
 
     /// <summary>
@@ -200,9 +247,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!TransformIndexedBuildables.TryGetValue(buildable.Model, out var storedBuild))
             TransformIndexedBuildables.Add(buildable.Model, buildable);
         else
-            Logger.LogWarning(
+            LogManager.Warning(
                 $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
+        Buildables.Add(buildable);
         EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
     }
 
@@ -221,9 +269,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!TransformIndexedBuildables.TryGetValue(buildable.Model, out var storedBuild))
             TransformIndexedBuildables.Add(buildable.Model, buildable);
         else
-            Logger.LogWarning(
+            LogManager.Warning(
                 $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
+        Buildables.Add(buildable);
         EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
     }
 }

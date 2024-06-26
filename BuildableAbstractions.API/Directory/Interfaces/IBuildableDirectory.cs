@@ -3,16 +3,19 @@ using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
+using Pustalorc.Libraries.RocketModServices.Services.Interfaces;
 using UnityEngine;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 
+/// <inheritdoc />
 /// <summary>
-///     An <see cref="IBuildableDirectory" /> should handles all of nelson's events related to buildables,
+///     An <see cref="T:Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces.IBuildableDirectory" /> should
+///     handles all of nelson's events related to buildables,
 ///     hold a basic list of all buildables in the map, index them, and raise events for buildable changes.
 /// </summary>
 [PublicAPI]
-public interface IBuildableDirectory
+public interface IBuildableDirectory : IService
 {
     /// <summary>
     ///     The number of buildables tracked by the directory.
@@ -37,7 +40,7 @@ public interface IBuildableDirectory
     public IEnumerable<T> GetBuildables<T>(GetBuildableOptions options = default) where T : Buildable;
 
     /// <summary>
-    ///     Gets a buildable of the specified type that has a specific transform.
+    ///     Gets a <see cref="Buildable"/> of the specified type that has a specific transform.
     /// </summary>
     /// <param name="transform">The transform of the buildable</param>
     /// <typeparam name="T">
@@ -54,7 +57,7 @@ public interface IBuildableDirectory
     public T? GetBuildable<T>(Transform transform) where T : Buildable;
 
     /// <summary>
-    ///     Gets a buildable of the specified type that has a specific instance id.
+    ///     Gets a <see cref="Buildable"/> of the specified type that has a specific instance id.
     /// </summary>
     /// <param name="instanceId">The instance id of the buildable</param>
     /// <typeparam name="T">
