@@ -155,7 +155,8 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
                 regionCount, stopwatch.ElapsedMilliseconds));
         }
 
-        LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, 100, regionCount, regionCount, stopwatch.ElapsedMilliseconds));
+        LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, 100, regionCount, regionCount,
+            stopwatch.ElapsedMilliseconds));
 
         LogManager.Debug(LoggingConstants.LoadingStructures);
         var structureRegions = StructureManager.regions.Cast<StructureRegion>().ToList();
@@ -166,6 +167,7 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
         LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 0, 0, regionCount,
             stopwatch.ElapsedMilliseconds));
 
+        var startTime = stopwatch.ElapsedMilliseconds;
         for (var regionIndex = 0; regionIndex < regionCount; regionIndex++)
         {
             var position = regionIndex + 1;
@@ -179,11 +181,13 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
 
             var percentageCompleted = Math.Ceiling(position / (double)regionCount * 100);
             LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, percentageCompleted, position,
-                regionCount, stopwatch.ElapsedMilliseconds));
+                regionCount, stopwatch.ElapsedMilliseconds - startTime));
         }
 
-        LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 100, regionCount, regionCount, stopwatch.ElapsedMilliseconds));
-        LogManager.Information(string.Format(LoggingConstants.BuildableLoadFinished, Buildables.Count));
+        LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 100, regionCount, regionCount,
+            stopwatch.ElapsedMilliseconds));
+        LogManager.Information(string.Format(LoggingConstants.BuildableLoadFinished, Buildables.Count,
+            stopwatch.ElapsedMilliseconds));
     }
 
     /// <inheritdoc />
