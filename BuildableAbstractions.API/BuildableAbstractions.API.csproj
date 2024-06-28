@@ -31,7 +31,7 @@
 
     <ItemGroup>
         <Reference Include="Pustalorc.Logging.API">
-          <HintPath>..\..\Logging\Pustalorc.Logging.API\bin\Release\net481\Pustalorc.Logging.API.dll</HintPath>
+            <HintPath>..\..\Logging\Pustalorc.Logging.API\bin\Release\net481\Pustalorc.Logging.API.dll</HintPath>
         </Reference>
         <Reference Include="Rocket.Core">
             <HintPath>..\libs\Rocket.Core.dll</HintPath>

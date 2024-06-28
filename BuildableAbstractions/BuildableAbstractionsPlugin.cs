@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
+using Pustalorc.Libraries.Logging.API.Manager;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Extensions;
 using Pustalorc.Libraries.RocketModServices.Services;
 using Pustalorc.Plugins.BuildableAbstractions.Commands.Actions;
 using Pustalorc.Plugins.BuildableAbstractions.Commands.Information;
 using Pustalorc.Plugins.BuildableAbstractions.Commands.Wreck;
+using Pustalorc.Plugins.BuildableAbstractions.Constants;
 using Rocket.Core.Plugins;
 
 namespace Pustalorc.Plugins.BuildableAbstractions;
@@ -40,6 +42,13 @@ public sealed class BuildableAbstractionsPlugin : RocketPlugin
     /// <inheritdoc />
     protected override void Load()
     {
-        Commands.LoadAndRegisterCommands(this);
+        Commands.ReloadCommands(this);
+        LogManager.Information(LoggingConstants.PluginLoaded);
+    }
+
+    /// <inheritdoc />
+    protected override void Unload()
+    {
+        LogManager.Information(LoggingConstants.PluginUnloaded);
     }
 }

@@ -18,6 +18,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Reference Include="Pustalorc.Logging.API">
+            <HintPath>..\..\Logging\Pustalorc.Logging.API\bin\Release\net481\Pustalorc.Logging.API.dll</HintPath>
+        </Reference>
         <Reference Include="Rocket.API">
             <HintPath>..\libs\Rocket.API.dll</HintPath>
         </Reference>
