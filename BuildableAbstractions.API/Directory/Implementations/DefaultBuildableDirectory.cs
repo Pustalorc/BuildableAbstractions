@@ -155,6 +155,8 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
                 regionCount, stopwatch.ElapsedMilliseconds));
         }
 
+        LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, 100, regionCount, regionCount, stopwatch.ElapsedMilliseconds));
+
         LogManager.Debug(LoggingConstants.LoadingStructures);
         var structureRegions = StructureManager.regions.Cast<StructureRegion>().ToList();
 
@@ -180,6 +182,7 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
                 regionCount, stopwatch.ElapsedMilliseconds));
         }
 
+        LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 100, regionCount, regionCount, stopwatch.ElapsedMilliseconds));
         LogManager.Information(string.Format(LoggingConstants.BuildableLoadFinished, Buildables.Count));
     }
 
