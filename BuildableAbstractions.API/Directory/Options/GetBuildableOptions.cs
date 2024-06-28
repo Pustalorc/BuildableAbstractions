@@ -87,7 +87,7 @@ public readonly struct GetBuildableOptions
     }
 
     /// <summary>
-    /// Generates the struct with the default values
+    ///     Generates the struct with the default values
     /// </summary>
     public GetBuildableOptions()
     {

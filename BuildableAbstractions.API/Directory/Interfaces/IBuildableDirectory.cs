@@ -40,7 +40,7 @@ public interface IBuildableDirectory : IService
     public IEnumerable<T> GetBuildables<T>(GetBuildableOptions options = default) where T : Buildable;
 
     /// <summary>
-    ///     Gets a <see cref="Buildable"/> of the specified type that has a specific transform.
+    ///     Gets a <see cref="Buildable" /> of the specified type that has a specific transform.
     /// </summary>
     /// <param name="transform">The transform of the buildable</param>
     /// <typeparam name="T">
@@ -57,7 +57,7 @@ public interface IBuildableDirectory : IService
     public T? GetBuildable<T>(Transform transform) where T : Buildable;
 
     /// <summary>
-    ///     Gets a <see cref="Buildable"/> of the specified type that has a specific instance id.
+    ///     Gets a <see cref="Buildable" /> of the specified type that has a specific instance id.
     /// </summary>
     /// <param name="instanceId">The instance id of the buildable</param>
     /// <typeparam name="T">

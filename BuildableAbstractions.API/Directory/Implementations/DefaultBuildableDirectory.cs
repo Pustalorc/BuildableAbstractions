@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using Pustalorc.Libraries.BuildableAbstractions.API.BuildableChangeDelayer.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Constants;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Destroy;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Spawn;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Transform;
@@ -11,7 +14,6 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Extensions;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.API.Patches;
-using Pustalorc.Libraries.Logging.API.Loggers.Configuration.Implementations;
 using Pustalorc.Libraries.Logging.API.Loggers.Configuration.Interfaces;
 using Pustalorc.Libraries.Logging.API.LogLevels.Implementations;
 using Pustalorc.Libraries.Logging.API.Manager;
@@ -56,20 +58,7 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
     /// </summary>
     protected Dictionary<Transform, Buildable> TransformIndexedBuildables { get; }
 
-    private class LogConfiguration : ILoggerConfiguration
-    {
-        public byte MaxLogLevel => LogLevel.Debug.Level;
-    }
-
     /// <inheritdoc />
-    /// <summary>
-    ///     The constructor for the directory.
-    /// </summary>
-    /// <remarks>
-    ///     This constructor hooks onto Level.onPostLevelLoaded.
-    ///     If you inherit this class, and you instantiate it when the server is fully loaded,
-    ///     you will have to manually call LevelLoaded(0) yourself, as the event will not fire again.
-    /// </remarks>
     public DefaultBuildableDirectory()
     {
         Buildables = new List<Buildable>();
@@ -117,13 +106,13 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
         if (Level.isLoaded)
             LevelLoaded(0);
         else
-            Level.onPostLevelLoaded += LevelLoaded;
+            Level.onLevelLoaded += LevelLoaded;
     }
 
     /// <inheritdoc />
     public virtual void Unload()
     {
-        Level.onPostLevelLoaded -= LevelLoaded;
+        Level.onLevelLoaded -= LevelLoaded;
         UnhookFromEvents();
     }
 
@@ -132,28 +121,66 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
     /// </summary>
     protected virtual void LevelLoaded(int id)
     {
-        LogManager.Debug("Level loaded, hooking onto unturned events...");
+        const double logPercentage = 0.085;
+
+        LogManager.Debug(LoggingConstants.LevelLoadedHookingOntoEvents);
         HookToEvents();
 
-        LogManager.Debug("Registering and tracking all barricades...");
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        LogManager.Debug(LoggingConstants.LoadingBarricades);
         var barricadeRegions = BarricadeManager.regions.Cast<BarricadeRegion>().Concat(BarricadeManager.vehicleRegions)
             .ToList();
 
-        foreach (var region in barricadeRegions)
-        foreach (var drop in region.drops)
-            BarricadeSpawned(region, drop);
+        var regionCount = barricadeRegions.Count;
+        var regionLogRate = Math.Floor(regionCount * logPercentage);
 
-        LogManager.Debug("All barricades registered!");
+        LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, 0, 0, regionCount,
+            stopwatch.ElapsedMilliseconds));
 
-        LogManager.Debug("Registering and tracking all structures...");
+        for (var regionIndex = 0; regionIndex < regionCount; regionIndex++)
+        {
+            var position = regionIndex + 1;
+            var region = barricadeRegions[regionIndex];
+
+            foreach (var drop in region.drops)
+                BarricadeSpawned(region, drop);
+
+            if (position % regionLogRate != 0)
+                continue;
+
+            var percentageCompleted = Math.Ceiling(position / (double)regionCount * 100);
+            LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, percentageCompleted, position,
+                regionCount, stopwatch.ElapsedMilliseconds));
+        }
+
+        LogManager.Debug(LoggingConstants.LoadingStructures);
         var structureRegions = StructureManager.regions.Cast<StructureRegion>().ToList();
 
-        foreach (var region in structureRegions)
-        foreach (var drop in region.drops)
-            StructureSpawned(region, drop);
-        LogManager.Debug("All structures registered!");
+        regionCount = structureRegions.Count;
+        regionLogRate = Math.Floor(regionCount * logPercentage);
 
-        LogManager.Information("Finished loading everything.");
+        LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 0, 0, regionCount,
+            stopwatch.ElapsedMilliseconds));
+
+        for (var regionIndex = 0; regionIndex < regionCount; regionIndex++)
+        {
+            var position = regionIndex + 1;
+            var region = structureRegions[regionIndex];
+
+            foreach (var drop in region.drops)
+                StructureSpawned(region, drop);
+
+            if (position % regionLogRate != 0)
+                continue;
+
+            var percentageCompleted = Math.Ceiling(position / (double)regionCount * 100);
+            LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, percentageCompleted, position,
+                regionCount, stopwatch.ElapsedMilliseconds));
+        }
+
+        LogManager.Information(string.Format(LoggingConstants.BuildableLoadFinished, Buildables.Count));
     }
 
     /// <inheritdoc />
@@ -274,5 +301,10 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
 
         Buildables.Add(buildable);
         EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
+    }
+
+    private class LogConfiguration : ILoggerConfiguration
+    {
+        public byte MaxLogLevel => LogLevel.Debug.Level;
     }
 }

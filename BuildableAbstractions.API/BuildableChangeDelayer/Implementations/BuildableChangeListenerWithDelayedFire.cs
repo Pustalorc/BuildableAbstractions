@@ -109,9 +109,11 @@ public class BuildableChangeListenerWithDelayedFire
         while (DeferredTransformed.TryDequeue(out var element))
             deferredTransformed.Add(element);
 
-        EventBus.Publish<DelayedBuildablesTransformedEvent>(new DelayedBuildablesTransformedEventArguments(deferredTransformed));
+        EventBus.Publish<DelayedBuildablesTransformedEvent>(
+            new DelayedBuildablesTransformedEventArguments(deferredTransformed));
         EventBus.Publish<DelayedBuildablesSpawnedEvent>(new DelayedBuildablesSpawnedEventArguments(deferredSpawned));
-        EventBus.Publish<DelayedBuildablesDestroyedEvent>(new DelayedBuildablesDestroyedEventArguments(deferredDestroyed));
+        EventBus.Publish<DelayedBuildablesDestroyedEvent>(
+            new DelayedBuildablesDestroyedEventArguments(deferredDestroyed));
         return Task.CompletedTask;
     }
 }
