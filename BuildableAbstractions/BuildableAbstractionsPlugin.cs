@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
-using Pustalorc.Libraries.Logging.API.Manager;
+using Pustalorc.Libraries.Logging.Manager;
 using Pustalorc.Libraries.RocketModCommandsExtended.Abstractions;
 using Pustalorc.Libraries.RocketModCommandsExtended.Extensions;
 using Pustalorc.Libraries.RocketModServices.Services;

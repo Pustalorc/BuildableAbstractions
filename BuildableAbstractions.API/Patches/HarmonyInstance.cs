@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using Pustalorc.Libraries.BuildableAbstractions.API.Patches.Constants;
-using Pustalorc.Libraries.Logging.API.Manager;
+using Pustalorc.Libraries.Logging.Manager;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Patches;
 

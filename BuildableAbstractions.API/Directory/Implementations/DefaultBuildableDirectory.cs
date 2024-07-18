@@ -14,9 +14,11 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Extensions;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.API.Patches;
-using Pustalorc.Libraries.Logging.API.Loggers.Configuration.Interfaces;
-using Pustalorc.Libraries.Logging.API.LogLevels.Implementations;
-using Pustalorc.Libraries.Logging.API.Manager;
+using Pustalorc.Libraries.Logging.API.Loggers.Configuration;
+using Pustalorc.Libraries.Logging.API.Pipes.Configuration;
+using Pustalorc.Libraries.Logging.LogLevels;
+using Pustalorc.Libraries.Logging.Manager;
+using Pustalorc.Libraries.Logging.Pipes.Configuration;
 using Pustalorc.Libraries.RocketModServices.Events.Bus;
 using SDG.Unturned;
 using UnityEngine;
@@ -163,11 +165,11 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
 
         regionCount = structureRegions.Count;
         regionLogRate = Math.Floor(regionCount * logPercentage);
+        var startTime = stopwatch.ElapsedMilliseconds;
 
         LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 0, 0, regionCount,
-            stopwatch.ElapsedMilliseconds));
+            stopwatch.ElapsedMilliseconds - startTime));
 
-        var startTime = stopwatch.ElapsedMilliseconds;
         for (var regionIndex = 0; regionIndex < regionCount; regionIndex++)
         {
             var position = regionIndex + 1;
@@ -185,7 +187,7 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
         }
 
         LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 100, regionCount, regionCount,
-            stopwatch.ElapsedMilliseconds));
+            stopwatch.ElapsedMilliseconds - startTime));
         LogManager.Information(string.Format(LoggingConstants.BuildableLoadFinished, Buildables.Count,
             stopwatch.ElapsedMilliseconds));
     }
@@ -312,6 +314,20 @@ public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire,
 
     private class LogConfiguration : ILoggerConfiguration
     {
-        public byte MaxLogLevel => LogLevel.Debug.Level;
+        public List<IPipeConfiguration> PipeSettings =>
+        [
+            new ConsolePipeConfiguration(),
+            new FilePipeConfiguration()
+        ];
+
+        private sealed class ConsolePipeConfiguration : DefaultConsolePipeConfiguration
+        {
+            public override byte MaxLogLevel => LogLevel.Debug.Level;
+        }
+
+        private sealed class FilePipeConfiguration : DefaultFilePipeConfiguration
+        {
+            public override byte MaxLogLevel => LogLevel.Debug.Level;
+        }
     }
 }
