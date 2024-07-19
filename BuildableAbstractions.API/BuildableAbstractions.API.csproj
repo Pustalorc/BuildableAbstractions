@@ -13,8 +13,8 @@
         <Company>Pustalorc</Company>
         <Copyright>Copyright © Pustalorc 2024</Copyright>
         <AssemblyVersion>1.0.0</AssemblyVersion>
-        <PackageVersion>1.0.0</PackageVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <PackageVersion>1.0.1</PackageVersion>
+        <FileVersion>1.0.1</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -37,7 +37,7 @@
 
     <ItemGroup>
         <PackageReference Include="Lib.Harmony" Version="2.3.3"/>
-        <PackageReference Include="Pustalorc.Logging" Version="1.0.1" />
+        <PackageReference Include="Pustalorc.Logging" Version="1.0.3" />
         <PackageReference Include="Pustalorc.RocketModServices" Version="1.1.0"/>
         <PackageReference Include="Pustalorc.AsyncTaskDispatcher" Version="1.2.0"/>
         <PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.12.3" PrivateAssets="all"/>
