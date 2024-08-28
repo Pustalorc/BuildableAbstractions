@@ -1,4 +1,4 @@
-# Buildable Abstractions [![NuGet](https://img.shields.io/nuget/v/Pustalorc.BuildableAbstractions.svg)](https://www.nuget.org/packages/Pustalorc.BuildableAbstractions/)
+# Buildable Abstractions [![NuGet](https://img.shields.io/nuget/v/Pustalorc.BuildableAbstractions.API.svg)](https://www.nuget.org/packages/Pustalorc.BuildableAbstractions.API/)
 
 Unturned Library to abstract all buildables (Barricades & Structures) in unturned.  
 Download is available on [Github Releases](https://github.com/Pustalorc/BuildableAbstractions/releases/).  
