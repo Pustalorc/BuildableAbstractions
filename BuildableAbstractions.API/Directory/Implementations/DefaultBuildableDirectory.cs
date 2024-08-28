@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using Pustalorc.Libraries.BuildableAbstractions.API.BuildableChangeDelayer.Implementations;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Abstraction;
 using Pustalorc.Libraries.BuildableAbstractions.API.Buildables.Implementations;
+using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Constants;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Destroy;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Spawn;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Events.Transform;
@@ -10,16 +14,20 @@ using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Extensions;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces;
 using Pustalorc.Libraries.BuildableAbstractions.API.Directory.Options;
 using Pustalorc.Libraries.BuildableAbstractions.API.Patches;
+using Pustalorc.Libraries.Logging.API.Loggers.Configuration;
+using Pustalorc.Libraries.Logging.API.Pipes.Configuration;
+using Pustalorc.Libraries.Logging.LogLevels;
+using Pustalorc.Libraries.Logging.Manager;
+using Pustalorc.Libraries.Logging.Pipes.Configuration;
 using Pustalorc.Libraries.RocketModServices.Events.Bus;
 using SDG.Unturned;
 using UnityEngine;
-using Logger = Rocket.Core.Logging.Logger;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Directory.Implementations;
 
-/// <inheritdoc />
+/// <inheritdoc cref="Pustalorc.Libraries.BuildableAbstractions.API.Directory.Interfaces.IBuildableDirectory" />
 [PublicAPI]
-public class DefaultBuildableDirectory : IBuildableDirectory
+public class DefaultBuildableDirectory : BuildableChangeListenerWithDelayedFire, IBuildableDirectory
 {
     /// <inheritdoc />
     public int BuildableCount => Buildables.Count;
@@ -52,36 +60,14 @@ public class DefaultBuildableDirectory : IBuildableDirectory
     /// </summary>
     protected Dictionary<Transform, Buildable> TransformIndexedBuildables { get; }
 
-    /// <summary>
-    ///     The constructor for the directory.
-    /// </summary>
-    /// <remarks>
-    ///     This constructor hooks onto Level.onPostLevelLoaded.
-    ///     If you inherit this class, and you instantiate it when the server is fully loaded,
-    ///     you will have to manually call LevelLoaded(0) yourself, as the event will not fire again.
-    /// </remarks>
+    /// <inheritdoc />
     public DefaultBuildableDirectory()
     {
         Buildables = new List<Buildable>();
         InstanceIdIndexedBarricades = new Dictionary<uint, BarricadeBuildable>();
         InstanceIdIndexedStructures = new Dictionary<uint, StructureBuildable>();
         TransformIndexedBuildables = new Dictionary<Transform, Buildable>();
-
-        if (Level.isLoaded)
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // Force call in case that this class is instantiated post-level load.
-            // This should not be needed, but is there just in-case.
-            // For implementations overriding this class, they should still call this overriden method this way to avoid issues.
-            LevelLoaded(0);
-        else
-            Level.onPostLevelLoaded += LevelLoaded;
-
-        StructureManager.onStructureSpawned += StructureSpawned;
-        BarricadeManager.onBarricadeSpawned += BarricadeSpawned;
-        PatchBuildablesDestroy.OnStructureDestroyed += StructureDestroyed;
-        PatchBuildablesDestroy.OnBarricadeDestroyed += BarricadeDestroyed;
-        PatchBuildableTransforms.OnStructureTransformed += StructureTransformed;
-        PatchBuildableTransforms.OnBarricadeTransformed += BarricadeTransformed;
+        LogManager.UpdateConfiguration(new LogConfiguration());
     }
 
     /// <inheritdoc />
@@ -116,23 +102,120 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         return null;
     }
 
+    /// <inheritdoc />
+    public virtual void Load()
+    {
+        if (Level.isLoaded)
+            LevelLoaded(0);
+        else
+            Level.onLevelLoaded += LevelLoaded;
+    }
+
+    /// <inheritdoc />
+    public virtual void Unload()
+    {
+        Level.onLevelLoaded -= LevelLoaded;
+        UnhookFromEvents();
+    }
+
     /// <summary>
     ///     Method that hooks onto the LevelLoaded event.
     /// </summary>
     protected virtual void LevelLoaded(int id)
     {
+        const double logPercentage = 0.085;
+
+        LogManager.Debug(LoggingConstants.LevelLoadedHookingOntoEvents);
+        HookToEvents();
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        LogManager.Debug(LoggingConstants.LoadingBarricades);
         var barricadeRegions = BarricadeManager.regions.Cast<BarricadeRegion>().Concat(BarricadeManager.vehicleRegions)
             .ToList();
 
-        foreach (var region in barricadeRegions)
-        foreach (var drop in region.drops)
-            BarricadeSpawned(region, drop);
+        var regionCount = barricadeRegions.Count;
+        var regionLogRate = Math.Floor(regionCount * logPercentage);
 
+        LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, 0, 0, regionCount,
+            stopwatch.ElapsedMilliseconds));
+
+        for (var regionIndex = 0; regionIndex < regionCount; regionIndex++)
+        {
+            var position = regionIndex + 1;
+            var region = barricadeRegions[regionIndex];
+
+            foreach (var drop in region.drops)
+                BarricadeSpawned(region, drop);
+
+            if (position % regionLogRate != 0)
+                continue;
+
+            var percentageCompleted = Math.Ceiling(position / (double)regionCount * 100);
+            LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, percentageCompleted, position,
+                regionCount, stopwatch.ElapsedMilliseconds));
+        }
+
+        LogManager.Information(string.Format(LoggingConstants.BarricadeLoadProgress, 100, regionCount, regionCount,
+            stopwatch.ElapsedMilliseconds));
+
+        LogManager.Debug(LoggingConstants.LoadingStructures);
         var structureRegions = StructureManager.regions.Cast<StructureRegion>().ToList();
 
-        foreach (var region in structureRegions)
-        foreach (var drop in region.drops)
-            StructureSpawned(region, drop);
+        regionCount = structureRegions.Count;
+        regionLogRate = Math.Floor(regionCount * logPercentage);
+        var startTime = stopwatch.ElapsedMilliseconds;
+
+        LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 0, 0, regionCount,
+            stopwatch.ElapsedMilliseconds - startTime));
+
+        for (var regionIndex = 0; regionIndex < regionCount; regionIndex++)
+        {
+            var position = regionIndex + 1;
+            var region = structureRegions[regionIndex];
+
+            foreach (var drop in region.drops)
+                StructureSpawned(region, drop);
+
+            if (position % regionLogRate != 0)
+                continue;
+
+            var percentageCompleted = Math.Ceiling(position / (double)regionCount * 100);
+            LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, percentageCompleted, position,
+                regionCount, stopwatch.ElapsedMilliseconds - startTime));
+        }
+
+        LogManager.Information(string.Format(LoggingConstants.StructureLoadProgress, 100, regionCount, regionCount,
+            stopwatch.ElapsedMilliseconds - startTime));
+        LogManager.Information(string.Format(LoggingConstants.BuildableLoadFinished, Buildables.Count,
+            stopwatch.ElapsedMilliseconds));
+    }
+
+    /// <inheritdoc />
+    public override void HookToEvents()
+    {
+        base.HookToEvents();
+
+        StructureManager.onStructureSpawned += StructureSpawned;
+        BarricadeManager.onBarricadeSpawned += BarricadeSpawned;
+        PatchBuildablesDestroy.OnStructureDestroyed += StructureDestroyed;
+        PatchBuildablesDestroy.OnBarricadeDestroyed += BarricadeDestroyed;
+        PatchBuildableTransforms.OnStructureTransformed += StructureTransformed;
+        PatchBuildableTransforms.OnBarricadeTransformed += BarricadeTransformed;
+    }
+
+    /// <inheritdoc />
+    public override void UnhookFromEvents()
+    {
+        PatchBuildableTransforms.OnBarricadeTransformed -= BarricadeTransformed;
+        PatchBuildableTransforms.OnStructureTransformed -= StructureTransformed;
+        PatchBuildablesDestroy.OnBarricadeDestroyed -= BarricadeDestroyed;
+        PatchBuildablesDestroy.OnStructureDestroyed -= StructureDestroyed;
+        BarricadeManager.onBarricadeSpawned -= BarricadeSpawned;
+        StructureManager.onStructureSpawned -= StructureSpawned;
+
+        base.UnhookFromEvents();
     }
 
     /// <summary>
@@ -200,9 +283,10 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!TransformIndexedBuildables.TryGetValue(buildable.Model, out var storedBuild))
             TransformIndexedBuildables.Add(buildable.Model, buildable);
         else
-            Logger.LogWarning(
+            LogManager.Warning(
                 $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
+        Buildables.Add(buildable);
         EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
     }
 
@@ -221,9 +305,29 @@ public class DefaultBuildableDirectory : IBuildableDirectory
         if (!TransformIndexedBuildables.TryGetValue(buildable.Model, out var storedBuild))
             TransformIndexedBuildables.Add(buildable.Model, buildable);
         else
-            Logger.LogWarning(
+            LogManager.Warning(
                 $"Warning! Buildable model already indexed! Is unity being weird again? Stored model: {buildable.Model}. Stored buildable: {storedBuild}");
 
+        Buildables.Add(buildable);
         EventBus.Publish<BuildableSpawnedEvent>(new BuildableSpawnedEventArguments(buildable));
+    }
+
+    private class LogConfiguration : ILoggerConfiguration
+    {
+        public List<IPipeConfiguration> PipeSettings =>
+        [
+            new ConsolePipeConfiguration(),
+            new FilePipeConfiguration()
+        ];
+
+        private sealed class ConsolePipeConfiguration : DefaultConsolePipeConfiguration
+        {
+            public override byte MaxLogLevel => LogLevel.Debug.Level;
+        }
+
+        private sealed class FilePipeConfiguration : DefaultFilePipeConfiguration
+        {
+            public override byte MaxLogLevel => LogLevel.Debug.Level;
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using Pustalorc.Libraries.BuildableAbstractions.API.Patches.Constants;
+using Pustalorc.Libraries.Logging.Manager;
 
 namespace Pustalorc.Libraries.BuildableAbstractions.API.Patches;
 
@@ -8,7 +10,9 @@ internal static class HarmonyInstance
 
     static HarmonyInstance()
     {
-        Harmony = new Harmony("com.pustalorc.libraries.buildableAbstractions");
+        LogManager.Debug(LoggingConstants.ApplyingHarmonyPatch);
+        Harmony = new Harmony("com.pustalorc.libraries.buildableAbstractions.api");
         Harmony.PatchAll();
+        LogManager.Information(LoggingConstants.AppliedHarmonyPatch);
     }
 }
