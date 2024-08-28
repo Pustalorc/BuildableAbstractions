@@ -2,11 +2,11 @@
 
 Unturned Library to abstract all buildables (Barricades & Structures) in unturned.  
 Download is available on [Github Releases](https://github.com/Pustalorc/BuildableAbstractions/releases/).  
-For developers, you should use the [NuGet Package](https://www.nuget.org/packages/Pustalorc.BuildableAbstractions/).
-
-Note that this Library can also be ran as a Plugin in order to utilize the following commands and their functionality.
+For developers, you should use the [NuGet Package](https://www.nuget.org/packages/Pustalorc.BuildableAbstractions.API/).
 
 ---
+
+This repository also includes a sample plugin that utilises the library. The following is the config and documentation of the plugin side.
 
 ## Commands
 

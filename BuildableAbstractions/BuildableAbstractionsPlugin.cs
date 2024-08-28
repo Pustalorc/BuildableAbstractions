@@ -23,15 +23,15 @@ public sealed class BuildableAbstractionsPlugin : RocketPlugin
     {
         var translations = this.GetCurrentTranslationsForCommands();
 
-        Commands = new List<MultiThreadedRocketCommand>
-        {
+        Commands =
+        [
             new FindBuildsCommand(translations),
             new RemoveBuildableCommand(translations),
             new TeleportToBuildCommand(translations),
             new TopBuildersCommand(translations),
             new WreckCommand(translations),
             new WreckVehicleCommand(translations)
-        };
+        ];
 
         if (RocketModService<IBuildableDirectory>.TryGetService() == default)
             RocketModService<IBuildableDirectory>.RegisterService(new DefaultBuildableDirectory());
